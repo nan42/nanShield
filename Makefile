@@ -19,7 +19,7 @@ generate: .venv pkg/absorbdb.lua
 
 pkg/absorbdb.lua: .dbcache tools/absorbdb.yaml
 	( . .venv/bin/activate && \
-	  wowdb-query tools/absorbdb.yaml)
+	  wowdb-query -c tools/absorbdb.yaml -o pkg/absorbdb.lua absorbdb)
 
 .dbcache:
 	mkdir .dbcache
