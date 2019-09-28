@@ -1,19 +1,27 @@
-function aura_env:on_cleu(cleu, timestamp, event, ...)
-    local spellName, spellId, auraName, value
+function aura_env:on_cleu(triggerEvent, ...)
+    local event, spellName, spellId, auraName, value
+    local casterGUID = select(8, ...)
 
-    if self.playerGUID == select(6, ...) then
-        self:log(cleu, timestamp, event, ...)
+    if triggerEvent == 'OPTIONS' then
+        self:log(triggerEvent, ...)
+        self:MockValues()
+    elseif self.playerGUID == casterGUID then
+        self:log(triggerEvent, ...)
+        event = select(2, ...)
         if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
-            spellName = select(11, ...)
+            spellName = select(13, ...)
             self:ApplyAura(spellName)
         elseif event == "SPELL_AURA_REMOVED" then
-            spellName = select(11, ...)
+            spellName = select(13, ...)
             self:RemoveAura(spellName)
         elseif event == "SPELL_ABSORBED" then
-            spellName = select(15, ...)
-            value = select(17, ...) or 0
+            spellName = select(17, ...)
+            value = select(19, ...) or 0
             self:ApplyDamage(spellName, value)
         end
+    elseif not casterGUID then
+        self:log(triggerEvent, ...)
+        self:ResetValues()
     end
     return self.totalAbsorb > 0
 end

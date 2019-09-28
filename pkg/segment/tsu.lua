@@ -1,4 +1,4 @@
-function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
+function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb, ...)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0
@@ -11,7 +11,7 @@ function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
         }
     end
 
-    if now - timestamp > 0.4 / self.config.segmentCount then
+    if now - timestamp > 0.25 / self.config.segmentCount then
         self.timestamp = now
         if active < #allstates and allstates[active + 1].show then
             for i = #allstates, active + 1, -1 do

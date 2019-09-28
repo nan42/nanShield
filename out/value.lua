@@ -122,9 +122,11 @@ function aura_env:ApplyAura(spellName)
 end
 
 function aura_env:RemoveAura(spellName)
+    self:log('RemoveAura', spellName)
     if self.currentAbsorb[spellName] then
         self.currentAbsorb[spellName] = nil
         self.active = self.active - 1
+        self:log('RemoveAuraRemaining', self.active)
         if self.active <= 1 then
             self.active = 0
             wipe(self.maxAbsorb)
@@ -134,6 +136,7 @@ function aura_env:RemoveAura(spellName)
 end
 
 function aura_env:ApplyDamage(spellName, value)
+    self:log('ApplyDamage', spellName, value)
     local newValue = (self.currentAbsorb[spellName] or 0) - value
     if self.maxAbsorb[spellName] then
         self.currentAbsorb[spellName] = max(0, newValue)
@@ -141,6 +144,31 @@ function aura_env:ApplyDamage(spellName, value)
     else
         self.currentAbsorb[spellName] = newValue
     end
+end
+
+function aura_env:MockValues()
+    self:log('MockValues')
+    self.totalAbsorb = 2000
+    self.displaySchool = "All"
+    self.displayValue = 300
+    WeakAuras.ScanEvents("WA_NAN_SHIELD",
+        2000, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100)
+end
+
+function aura_env:ResetValues()
+    self:log('ResetValues')
+    local spellName
+    wipe(self.currentAbsorb)
+    wipe(self.maxAbsorb)
+    self.active = 0
+    for i = 1, 255 do
+        spellName = UnitBuff("player", i)
+        if not spellName then
+            break
+        end
+        self:ApplyAura(spellName)
+    end
+    self:UpdateValues()
 end
 
 function aura_env:UpdateValues()
@@ -163,6 +191,7 @@ function aura_env:UpdateValues()
         total = total + maxValue
         value = (current[spell] or 0)
         values[key] = values[key] + value
+        self:log('UpdateValues', spell, spellSchool[spell], key, maxValue, value)
         if not displayValue or value < displayValue and value > 0 then
             displayValue = value
             displaySchool = spellSchool[spell]
@@ -171,30 +200,40 @@ function aura_env:UpdateValues()
 
     if displaySchool ~= 127 then
         displayValue = displayValue + values[1]
+    elseif not displayValue then
+        displayValue = 0
     end
 
     self.totalAbsorb = total
     self.displaySchool = self.absorbDbSchools[displaySchool]
     self.displayValue = displayValue
-    WeakAuras.ScanEvents("WA_NAN_SHIELD", total, unpack(values))
+    WeakAuras.ScanEvents("WA_NAN_SHIELD", total, displayValue, unpack(values))
     self:log('UpdateValues', total > 0)
 end
-function aura_env:on_cleu(cleu, timestamp, event, ...)
-    local spellName, spellId, auraName, value
+function aura_env:on_cleu(triggerEvent, ...)
+    local event, spellName, spellId, auraName, value
+    local casterGUID = select(8, ...)
 
-    if self.playerGUID == select(6, ...) then
-        self:log(cleu, timestamp, event, ...)
+    if triggerEvent == 'OPTIONS' then
+        self:log(triggerEvent, ...)
+        self:MockValues()
+    elseif self.playerGUID == casterGUID then
+        self:log(triggerEvent, ...)
+        event = select(2, ...)
         if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_REFRESH" then
-            spellName = select(11, ...)
+            spellName = select(13, ...)
             self:ApplyAura(spellName)
         elseif event == "SPELL_AURA_REMOVED" then
-            spellName = select(11, ...)
+            spellName = select(13, ...)
             self:RemoveAura(spellName)
         elseif event == "SPELL_ABSORBED" then
-            spellName = select(15, ...)
-            value = select(17, ...) or 0
+            spellName = select(17, ...)
+            value = select(19, ...) or 0
             self:ApplyDamage(spellName, value)
         end
+    elseif not casterGUID then
+        self:log(triggerEvent, ...)
+        self:ResetValues()
     end
     return self.totalAbsorb > 0
 end

@@ -3,7 +3,7 @@ function aura_env:rotate()
     local angle = self.config.curveAngle
     self.region:Rotate(180 + (angle / (segments - 1)) * (self.cloneId - (segments + 1) / 2))
 end
-function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
+function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb, ...)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0
@@ -16,7 +16,7 @@ function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
         }
     end
 
-    if now - timestamp > 0.4 / self.config.segmentCount then
+    if now - timestamp > 0.25 / self.config.segmentCount then
         self.timestamp = now
         if active < #allstates and allstates[active + 1].show then
             for i = #allstates, active + 1, -1 do
@@ -40,8 +40,16 @@ function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
     end
     return changed
 end
-function aura_env:on_nan_shield(event, totalAbsorb, currentAbsorb)
+function aura_env:on_nan_shield(event, totalAbsorb, displayValue, ...)
+    self:log(event, totalAbsorb, displayValue, ...)
+    local currentAbsorb = 0
+    local items = select("#", ...)
     self.active = 0
+
+    for i = 1, items do
+        currentAbsorb = currentAbsorb + select(i, ...)
+    end
+
     if currentAbsorb and totalAbsorb > 0 then
         self.active = ceil(currentAbsorb / totalAbsorb * self.config.segmentCount)
     end
