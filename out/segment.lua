@@ -3,7 +3,8 @@ function aura_env:rotate()
     local angle = self.config.curveAngle
     self.region:Rotate(180 + (angle / (segments - 1)) * (self.cloneId - (segments + 1) / 2))
 end
-function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb, ...)
+function aura_env:on_tsu(allstates, ...)
+    self:log('TSU', self.config.segmentCount)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0
@@ -40,18 +41,22 @@ function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb, ...)
     end
     return changed
 end
-function aura_env:on_nan_shield(event, totalAbsorb, displayValue, ...)
-    self:log(event, totalAbsorb, displayValue, ...)
+function aura_env:on_nan_shield(event, totalAbsorb, ...)
+    self:log(event, totalAbsorb, ...)
     local currentAbsorb = 0
-    local items = select("#", ...)
     self.active = 0
 
-    for i = 1, items do
-        currentAbsorb = currentAbsorb + select(i, ...)
-    end
+    if event == 'OPTIONS' then
+        self.active = self.config.segmentCount or 10
+        self:log(event, self.active)
+    else
+        for i = 1, select("#", ...) do
+            currentAbsorb = currentAbsorb + select(i, ...)
+        end
 
-    if currentAbsorb and totalAbsorb > 0 then
-        self.active = ceil(currentAbsorb / totalAbsorb * self.config.segmentCount)
+        if currentAbsorb > 0 and totalAbsorb > 0 then
+            self.active = ceil(currentAbsorb / totalAbsorb * self.config.segmentCount)
+        end
     end
 end
 aura_env.logPalette = {
@@ -79,4 +84,20 @@ function aura_env:log(...)
         end
         print(unpack(args))
     end
+end
+aura_env.schools = {
+    "All",
+    "Physical",
+    "Magic",
+    "Holy",
+    "Fire",
+    "Nature",
+    "Frost",
+    "Shadow",
+    "Arcane",
+}
+aura_env.schoolIds = { 127, 1, 126, 2, 4, 8, 16, 32, 64 }
+aura_env.schoolIdx = {}
+for idx, id in ipairs(aura_env.schoolIds) do
+    aura_env.schoolIdx[id] = idx
 end

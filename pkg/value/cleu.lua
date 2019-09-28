@@ -4,7 +4,6 @@ function aura_env:on_cleu(triggerEvent, ...)
 
     if triggerEvent == 'OPTIONS' then
         self:log(triggerEvent, ...)
-        self:MockValues()
     elseif self.playerGUID == casterGUID then
         self:log(triggerEvent, ...)
         event = select(2, ...)
@@ -23,5 +22,4 @@ function aura_env:on_cleu(triggerEvent, ...)
         self:log(triggerEvent, ...)
         self:ResetValues()
     end
-    return self.totalAbsorb > 0
 end
