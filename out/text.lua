@@ -1,4 +1,5 @@
 function aura_env:on_tsu(allstates, ...)
+    -- self:log('TSU', self.config.segmentCount)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local currentAbsorb = self.currentAbsorb

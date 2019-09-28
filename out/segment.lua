@@ -4,7 +4,7 @@ function aura_env:rotate()
     self.region:Rotate(180 + (angle / (segments - 1)) * (self.cloneId - (segments + 1) / 2))
 end
 function aura_env:on_tsu(allstates, ...)
-    self:log('TSU', self.config.segmentCount)
+    -- self:log('TSU', self.config.segmentCount)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0
