@@ -151,7 +151,7 @@ function aura_env:UpdateValues()
     local current = self.currentAbsorb
     local total = 0
     local displaySchool = 127
-    local displayValue = 0
+    local displayValue
     local key, value
 
     for i = 1, #values do
@@ -163,7 +163,7 @@ function aura_env:UpdateValues()
         total = total + maxValue
         value = (current[spell] or 0)
         values[key] = values[key] + value
-        if value < displayValue and value > 0 then
+        if not displayValue or value < displayValue and value > 0 then
             displayValue = value
             displaySchool = spellSchool[spell]
         end
