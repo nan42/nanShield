@@ -177,6 +177,7 @@ function aura_env:UpdateValues()
     self.displaySchool = self.absorbDbSchools[displaySchool]
     self.displayValue = displayValue
     WeakAuras.ScanEvents("WA_NAN_SHIELD", total, unpack(values))
+    self:log('UpdateValues', total > 0)
 end
 function aura_env:on_cleu(cleu, timestamp, event, ...)
     local spellName, spellId, auraName, value

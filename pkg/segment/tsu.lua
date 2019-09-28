@@ -1,4 +1,4 @@
-function aura_env:on_tsu(allstates, event, currentAbsorb, totalAbsorb)
+function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0

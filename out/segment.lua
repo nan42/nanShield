@@ -3,7 +3,7 @@ function aura_env:rotate()
     local angle = self.config.curveAngle
     self.region:Rotate(180 + (angle / (segments - 1)) * (self.cloneId - (segments + 1) / 2))
 end
-function aura_env:on_tsu(allstates, event, currentAbsorb, totalAbsorb)
+function aura_env:on_tsu(allstates, event, totalAbsorb, currentAbsorb)
     local now = GetTime()
     local timestamp = self.timestamp or 0
     local active = self.active or 0
