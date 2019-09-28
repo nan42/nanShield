@@ -127,7 +127,7 @@ function aura_env:RemoveAura(spellName)
         self.currentAbsorb[spellName] = nil
         self.active = self.active - 1
         self:log('RemoveAuraRemaining', self.active)
-        if self.active <= 1 then
+        if self.active < 1 then
             self.active = 0
             wipe(self.maxAbsorb)
         end
