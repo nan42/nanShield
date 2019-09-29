@@ -14,8 +14,13 @@ function aura_env:on_cleu(triggerEvent, ...)
             spellName = select(13, ...)
             self:RemoveAura(spellName)
         elseif event == "SPELL_ABSORBED" then
-            spellName = select(17, ...)
-            value = select(19, ...) or 0
+            if select(20, ...) then
+                spellName = select(20, ...)
+                value = select(22, ...) or 0
+            else
+                spellName = select(17, ...)
+                value = select(19, ...) or 0
+            end
             self:ApplyDamage(spellName, value)
         end
     elseif not casterGUID then
