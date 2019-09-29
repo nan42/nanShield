@@ -8,7 +8,9 @@ segment_src += $(wildcard pkg/segment/*.lua) $(wildcard pkg/common/*.lua)
 segment_src += $(foreach t,$(wildcard pkg/segment/*.lua.yaml),$(t:pkg/%.yaml=generated/%))
 text_src += $(wildcard pkg/text/*.lua) $(wildcard pkg/common/*.lua)
 text_src += $(foreach t,$(wildcard pkg/text/*.lua.yaml),$(t:pkg/%.yaml=generated/%))
-targets += out/value.lua out/segment.lua out/text.lua out/group.lua
+bar_src += $(wildcard pkg/bar/*.lua) $(wildcard pkg/common/*.lua)
+bar_src += $(foreach t,$(wildcard pkg/bar/*.lua.yaml),$(t:pkg/%.yaml=generated/%))
+targets += out/value.lua out/segment.lua out/text.lua out/bar.lua out/group.lua
 
 .PHONY: all clean test coverage generate
 
@@ -33,6 +35,9 @@ out/value.lua: $(value_src)
 	cat $^ > $@
 
 out/text.lua: $(text_src)
+	cat $^ > $@
+
+out/bar.lua: $(bar_src)
 	cat $^ > $@
 
 out/group.lua: $(group_src)

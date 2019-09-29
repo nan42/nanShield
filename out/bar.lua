@@ -1,46 +1,48 @@
-function aura_env:on_tsu(allstates, ...)
-    -- self:log('TSU', self.config.segmentCount)
-    local now = GetTime()
-    local timestamp = self.timestamp or 0
-    local currentAbsorb = self.currentAbsorb
-    local state = allstates[1]
-
-    if not state then
-        state = {
-            changed = true,
-            show = false,
-            progressType = "static",
-            school = "All",
-            value = 0,
-            total = 0,
-        }
-        allstates[1] = state
-    end
-
-    if state.show ~= (currentAbsorb > 0) then
-        state.show = currentAbsorb > 0
-        state.changed = true
-        state.value = currentAbsorb
-        state.total = self.totalAbsorb
-        state.school = self.currentSchool
-        self.timestamp = now
-    elseif state.value ~= currentAbsorb then
-        state.changed = true
-        state.value = currentAbsorb
-        state.total = self.totalAbsorb
-        state.school = self.currentSchool
-        self.timestamp = now
-    end
-
-    return state.changed
-end
-function aura_env:on_nan_shield(event, ...)
+function aura_env:on_tsu(allstates, event, ...)
     self:log(event, ...)
-    local minValue, totalAbsorb, minIdx = self:LowestAbsorb(...)
-    self.currentAbsorb = ceil(minValue)
-    self.currentSchool = self.schools[minIdx]
-    self.totalAbsorb = ceil(totalAbsorb)
-    self:log('SetValues', self.currentSchool, self.currentAbsorb, self.totalAbsorb)
+    local changed = false
+    local state = allstates[1] or {
+        show = true,
+        changed = true,
+        progressType = 'static',
+        value = 0,
+        total = 0,
+        stacks = 0,
+        additionalProgress = {
+            {}, {}, {},
+            {}, {}, {},
+            {}, {}, {},
+        }
+    }
+    allstates[1] = state
+
+    if event == 'WA_NAN_SHIELD' and select(1, ...) then
+        local value, school
+        local minValue, totalAbsorb, minIdx = self:LowestAbsorb(...)
+        minValue = ceil(minValue)
+        totalAbsorb = ceil(totalAbsorb)
+
+        changed = changed or state.total ~= totalAbsorb
+        changed = changed or state.stacks ~= minValue
+        changed = changed or state.show ~= (minValue > 0)
+        state.show = minValue > 0
+        state.total = totalAbsorb
+        state.stacks = minValue
+        state.school = self.schools[minIdx]
+
+        for i, ap in ipairs(state.additionalProgress) do
+            value = select(i + 1, ...)
+            school = self.schools[i]
+            self:log('Set', school, value)
+            ap.direction = 'forward'
+            changed = changed or ap.width ~= value
+            ap.width = value
+            ap.school = school
+        end
+
+        allstates[1].changed = changed
+    end
+    return changed
 end
 aura_env.logPalette = {
     "ff6e7dda",
