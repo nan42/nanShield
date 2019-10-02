@@ -22,6 +22,10 @@ function aura_env:on_tsu(allstates, event, ...)
         minValue = ceil(minValue)
         totalAbsorb = ceil(totalAbsorb)
 
+        if self.config.isHealthPct then
+            totalAbsorb = UnitHealthMax("player")
+        end
+
         changed = changed or state.total ~= totalAbsorb
         changed = changed or state.stacks ~= minValue
         changed = changed or state.show ~= (minValue > 0)
