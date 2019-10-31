@@ -34,14 +34,16 @@ function aura_env:on_tsu(allstates, event, ...)
         state.stacks = minValue
         state.school = self.schools[minIdx]
 
+        local progressOffset = 0
         for i, ap in ipairs(state.additionalProgress) do
             value = select(i + 1, ...)
             school = self.schools[i]
             self:log('Set', school, value)
-            ap.direction = 'forward'
             changed = changed or ap.width ~= value
-            ap.width = value
+            ap.min = progressOffset
+            ap.max = progressOffset + value
             ap.school = school
+            progressOffset = progressOffset + value
         end
 
         allstates[1].changed = changed
