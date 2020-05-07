@@ -10,6 +10,12 @@ local function improvedPowerWordShieldMultiplier()
     return 1.15
 end
 
+local function improvedVoidWalker()
+    _,_,_,_,r = GetTalentInfo(2,5)
+    return 1+r*0.10
+end
+
+
 aura_env.talentMultiplier = {
     [   17] = improvedPowerWordShieldMultiplier,
     [  592] = improvedPowerWordShieldMultiplier,
@@ -21,6 +27,12 @@ aura_env.talentMultiplier = {
     [10899] = improvedPowerWordShieldMultiplier,
     [10900] = improvedPowerWordShieldMultiplier,
     [10901] = improvedPowerWordShieldMultiplier,
+    [ 7812] = improvedVoidWalker,
+    [19438] = improvedVoidWalker,
+    [19440] = improvedVoidWalker,
+    [19441] = improvedVoidWalker,
+    [19442] = improvedVoidWalker,
+    [19443] = improvedVoidWalker,
 }
 
 function aura_env:CalculateAbsorbValue(spellName, spellId, absorbInfo)
